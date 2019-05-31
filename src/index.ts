@@ -1,32 +1,19 @@
 import {
 	AddressDto,
 	iccAccesslogApi,
-	iccAuthApi,
-	iccBemikronoApi,
-	iccBeresultexportApi,
-	iccBeresultimportApi,
 	iccCalendarItemApi,
 	iccCalendarItemTypeApi,
+	IccCalendarItemXApi,
 	IccClassificationXApi,
-	iccDoctemplateApi,
 	iccEntityrefApi,
-	iccEntitytemplateApi,
-	iccGenericApi,
 	iccHcpartyApi,
-	iccIcureApi,
 	iccInsuranceApi,
-	iccReplicationApi,
-	iccTarificationApi,
 	PatientDto,
-	PatientPaginatedList,
-	UserDto
+	XHR
 } from 'icc-api'
 import PouchDB from 'pouchdb'
-import { XHR } from 'icc-api/icc-api/api/XHR'
 import _ from 'lodash'
 
-import { IccBedrugsXApi } from 'icc-api/dist/icc-x-api/icc-bedrugs-x-api'
-import { IccBekmehrXApi } from 'icc-api/dist/icc-x-api/icc-bekmehr-x-api'
 import { IccCodeXApi } from 'icc-api/dist/icc-x-api/icc-code-x-api'
 import { IccContactXApi } from 'icc-api/dist/icc-x-api/icc-contact-x-api'
 import { IccCryptoXApi } from 'icc-api/dist/icc-x-api/icc-crypto-x-api'
@@ -39,11 +26,9 @@ import { IccReceiptXApi } from 'icc-api/dist/icc-x-api/icc-receipt-x-api'
 import { IccUserXApi } from 'icc-api/dist/icc-x-api/icc-user-x-api'
 import { IccInvoiceXApi } from 'icc-api/dist/icc-x-api/icc-invoice-x-api'
 import { IccMessageXApi } from 'icc-api/dist/icc-x-api/icc-message-x-api'
-import * as models from 'icc-api/dist/icc-api/model/AccessLogPaginatedList'
 
 export namespace iccapipouched {
 
-	import doc = Mocha.reporters.doc
 	type PaginatorFunction<X> = (key: any, docId: string | null, limit: number | undefined) => Promise<PaginatorResponse<X>>
 	type PaginatorExecutor<X> = (latestPaginatorFunctionResult: PaginatorResponse<X>, acc: any[], limit: number | undefined) => Promise<PaginatorResponse<X>>
 
@@ -96,24 +81,12 @@ export namespace iccapipouched {
 		private readonly _lastSync: number
 
 		private readonly _accesslogicc: iccAccesslogApi
-		private readonly _authicc: iccAuthApi
-		private readonly _bemikronoicc: iccBemikronoApi
-		private readonly _onlineBeMikronoicc: iccBemikronoApi
-		private readonly _beresultexporticc: iccBeresultexportApi
-		private readonly _beresultimporticc: iccBeresultimportApi
-		private readonly _doctemplateicc: iccDoctemplateApi
-		private readonly _entitytemplateicc: iccEntitytemplateApi
-		private readonly _genericicc: iccGenericApi
-		private readonly _icureicc: iccIcureApi
 		private readonly _insuranceicc: iccInsuranceApi
-		private readonly _replicationicc: iccReplicationApi
-		private readonly _tarificationicc: iccTarificationApi
 		private readonly _entityreficc: iccEntityrefApi
 		private readonly _calendaritemicc: iccCalendarItemApi
 		private readonly _calendaritemtypeicc: iccCalendarItemTypeApi
 		private readonly _usericc: IccUserXApi
 		private readonly _codeicc: IccCodeXApi
-		private readonly _bedrugsicc: IccBedrugsXApi
 		private readonly _hcpartyiccLight: iccHcpartyApi
 		private readonly _hcpartyicc: IccHcpartyXApi
 		private readonly _cryptoicc: IccCryptoXApi
@@ -126,15 +99,13 @@ export namespace iccapipouched {
 		private readonly _classificationicc: IccClassificationXApi
 		private readonly _patienticc: IccPatientXApi
 		private readonly _messageicc: IccMessageXApi
-		private readonly _bekmehricc: IccBekmehrXApi
 
-		constructor(host: string, headers: Array<XHR.Header>, lastSync: number, databaseName?: string) {
-			this._database = new PouchDB(databaseName || 'icc-local-database')
-
-			this._database.get('_design/Patient')
+		constructor(host: string, username: string, password: string, headers?: { [key: string]: string }, lastSync?: number, localDatabaseName?: string) {
+			this._database = new PouchDB(localDatabaseName || 'icc-local-database')
 
 			const emit = (key: string) => { /* empty */ }
 
+			// this._database.get('_design/Patient')
 			const ddoc = {
 				_id: '_design/Patient',
 				views: {
@@ -188,35 +159,24 @@ export namespace iccapipouched {
 					}.toString()
 				}
 			}
-
 			this._database.put(ddoc).catch(e => console.log(e))
 
 			this._host = host
-			this._headers = headers
-			this._lastSync = lastSync
+			this._headers = _.toPairs(
+				Object.assign({ Authorization: `Basic ${btoa(`${username}:${password}`)}` }, headers || {})
+			).map(h => new XHR.Header(h[0], h[1]))
+			this._lastSync = lastSync || 0
 
 			this._accesslogicc = new iccAccesslogApi(this._host, this._headers)
-			this._authicc = new iccAuthApi(this._host, this._headers)
-			this._bemikronoicc = new iccBemikronoApi(this._host, this._headers)
-			this._onlineBeMikronoicc = new iccBemikronoApi(this._host && this._host.match(/https:\/\/backend.(.+).icure.cloud.+/) ? this._host : 'https://backend.svc.icure.cloud/rest/v1', this._headers)
-			this._beresultexporticc = new iccBeresultexportApi(this._host, this._headers)
-			this._beresultimporticc = new iccBeresultimportApi(this._host, this._headers)
-			this._doctemplateicc = new iccDoctemplateApi(this._host, this._headers)
-			this._entitytemplateicc = new iccEntitytemplateApi(this._host, this._headers)
-			this._genericicc = new iccGenericApi(this._host, this._headers)
-			this._icureicc = new iccIcureApi(this._host, this._headers)
 			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
-			this._replicationicc = new iccReplicationApi(this._host, this._headers)
-			this._tarificationicc = new iccTarificationApi(this._host, this._headers)
 			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
-			this._calendaritemicc = new iccCalendarItemApi(this._host, this._headers)
 			this._calendaritemtypeicc = new iccCalendarItemTypeApi(this._host, this._headers)
 			this._usericc = new IccUserXApi(this._host, this._headers)
 			this._codeicc = new IccCodeXApi(this._host, this._headers)
-			this._bedrugsicc = new IccBedrugsXApi(this._host, this._headers)
 			this._hcpartyiccLight = new iccHcpartyApi(this._host, this._headers)
 			this._hcpartyicc = new IccHcpartyXApi(this._host, this._headers)
 			this._cryptoicc = new IccCryptoXApi(this._host, this._headers, this._hcpartyicc)
+			this._calendaritemicc = new IccCalendarItemXApi(this._host, this._headers, this._cryptoicc)
 			this._receipticc = new IccReceiptXApi(this._host, this._headers, this._cryptoicc)
 			this._contacticc = new IccContactXApi(this._host, this._headers, this._cryptoicc)
 			this._documenticc = new IccDocumentXApi(this._host, this._headers, this._cryptoicc)
@@ -226,7 +186,6 @@ export namespace iccapipouched {
 			this._classificationicc = new IccClassificationXApi(this._host, this._headers, this._cryptoicc)
 			this._patienticc = new IccPatientXApi(this._host, this._headers, this._cryptoicc, this._contacticc, this._helementicc, this._invoiceicc, this._documenticc, this._hcpartyicc, this._classificationicc)
 			this._messageicc = new IccMessageXApi(this._host, this._headers, this._cryptoicc, this._insuranceicc, this._entityreficc, this._invoiceicc, this._documenticc, this._receipticc, this._patienticc)
-			this._bekmehricc = new IccBekmehrXApi(this._host, this._headers, this._contacticc, this._helementicc)
 		}
 
 		get host(): string {
@@ -249,10 +208,36 @@ export namespace iccapipouched {
 			return this._patienticc
 		}
 
+		get calendaritemicc(): iccCalendarItemApi {
+			return this._calendaritemicc
+		}
+
+		get usericc(): IccUserXApi {
+			return this._usericc
+		}
+
+		get hcpartyicc(): IccHcpartyXApi {
+			return this._hcpartyicc
+		}
+
+		get contacticc(): IccContactXApi {
+			return this._contacticc
+		}
+
+		async getPatient(id: string) {
+			const currentUser = await this._usericc.getCurrentUser()
+			if (!currentUser) {
+				throw new Error('You are not logged in')
+			}
+
+			return this._patienticc.getPatientWithUser(currentUser, id)
+		}
+
 		// TODO fix any to PatientStub
 		async search<T>(term: string): Promise < Array<any> > {
 			return this._database.query('Patient/by_searchString', {
 				key: term,
+
 				include_docs: true
 			}).then(result =>
 				result.rows.map(r => r.doc)
@@ -278,7 +263,7 @@ export namespace iccapipouched {
 						console.log(e)
 					}
 
-					const keysToKeep = ['firstName', 'lastName', 'maidenName', 'spouseName', 'addresses']
+					const keysToKeep = ['firstName', 'lastName', 'maidenName', 'spouseName', 'gender', 'dateOfBirth', 'externalId', 'addresses']
 
 					const filtered = Object.assign(keysToKeep
 						.filter(key => Object.keys(remotePat).includes(key))
@@ -438,7 +423,7 @@ export namespace iccapipouched {
 	/*
 		Factory method
 	*/
-export function newIccApiPouched(host: string, headers: Array<XHR.Header>, lastSync: number, databaseName?: string): IccApiPouched {
-	return new IccApiPouchedImpl(host, headers, lastSync, databaseName)
+export function newIccApiPouched(host: string, username: string, password: string, headers?: { [key: string]: string }, lastSync?: number, localDatabaseName?: string): IccApiPouched {
+	return new IccApiPouchedImpl(host, username, password, headers, lastSync, localDatabaseName)
 }
 }
