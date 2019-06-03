@@ -32,6 +32,11 @@ module.exports = function(config) {
         "baseUrl": "./",
         allowJs: true,
       },
+		bundlerOptions: {
+			transforms: [
+				require("karma-typescript-es6-transform")()
+			]
+		}
     },
 
     // list of files / patterns to load in the browser

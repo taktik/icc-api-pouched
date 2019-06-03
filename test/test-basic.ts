@@ -9,15 +9,15 @@ describe('iccapipouched', () => {
 			const password = 'knalou'
 			const host = 'https://backend.svc.icure.cloud/rest/v1/'
 			const b64 = btoa(`${ login }:${ password }`)
-			const headers: Array<XHR.Header> = {
-				'cache-control': 'no-cache',
-				Authorization: `Basic ${ b64 }`,
+			const headers: any = {
+				//'cache-control': 'no-cache',
+				//Authorization: `Basic ${ b64 }`,
 				'Content-Type': 'application/json',
 				Accept: 'application/json'
 			}
 			const lastSync = 1559563185
 			const databaseName = undefined
-			const iccApiPouched = iccapipouched.newIccApiPouched(host, headers, lastSync, databaseName)
+			const iccApiPouched = iccapipouched.newIccApiPouched(host, headers as any, lastSync, databaseName)
 			assert.equal(typeof iccApiPouched, 'object')
 		})
 	})
