@@ -20,7 +20,7 @@ describe('iccapipouched', () => {
 		})
 	}),
 	describe('syncPatients', function() {
-		this.timeout(20000)
+		this.timeout(60000)
 		it('should sync a list of patients', async function() {
 			const login = 'abdemo'
 			const password = 'knalou'
@@ -36,8 +36,8 @@ describe('iccapipouched', () => {
 
 			await iccApiPouched.sync()
 
-			const pats = await iccApiPouched.search('')
-
+			const pats = await iccApiPouched.search('du')
+			console.log('Search results', pats)
 			assert.isAbove(pats.length, 10)
 		})
 	})
