@@ -8,10 +8,10 @@ describe('iccapipouched', () => {
 			const login = 'abdemo'
 			const password = 'knalou'
 			const host = 'https://backend.svc.icure.cloud/rest/v1/'
-			const b64 = btoa(`${login}:${password}`)
+			const b64 = btoa(`${ login }:${ password }`)
 			const headers: Array<XHR.Header> = {
 				'cache-control': 'no-cache',
-				Authorization: `Basic ${b64}`,
+				Authorization: `Basic ${ b64 }`,
 				'Content-Type': 'application/json',
 				Accept: 'application/json'
 			}
