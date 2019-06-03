@@ -56,7 +56,7 @@ export namespace iccapipouched {
 	}
 
 	export interface IccApiPouched {
-		sync(): Promise<void>
+		sync(max?: number): Promise<void>
 
 		search<T>(term: string): Promise<Array<any>>
 	}
@@ -106,7 +106,6 @@ export namespace iccapipouched {
 			const emit = (key: string) => { /* empty */
 			}
 
-			// this._database.get('_design/Patient')
 			const ddoc = {
 				_id: '_design/Patient',
 				views: {
@@ -252,22 +251,23 @@ export namespace iccapipouched {
 			)
 		}
 
-		async sync(): Promise<void> {
-			debugger
+		async sync(max = 10000): Promise<void> {
 			const currentUser = await this._usericc.getCurrentUser()
 			if (currentUser) {
 				const paginator: PaginatorFunction<PatientDto> = async (key: number, docId: string | null, limit: number | undefined) => {
-					const pl = await this.patienticc.listOfPatientsModifiedAfterWithUser(currentUser, this.lastSync, key, docId || undefined, limit || undefined)
+					const pl = await this.patienticc.listOfPatientsModifiedAfterWithUser(currentUser, this.lastSync, key, docId || undefined, limit || 100)
+					max -= pl.rows.length
 					return {
 						rows: pl.rows,
 						nextKey: pl.nextKeyPair && pl.nextKeyPair.startKey,
 						nextDocId: pl.nextKeyPair && pl.nextKeyPair.startKeyDocId,
-						done: !pl.nextKeyPair
+						done: !pl.nextKeyPair || max <= 0
 					}
 				}
 
 				const patList = await this.getRowsUsingPagination(paginator)
-				_.sortBy(patList, pat => -(pat.modified || 0)).reduce(async (prev: Promise<void>, remotePat) => {
+
+				await _.sortBy(patList, pat => -(pat.modified || 0)).reduce(async (prev: Promise<void>, remotePat) => {
 					try {
 						await prev
 					} catch (e) {
@@ -287,9 +287,11 @@ export namespace iccapipouched {
 						try {
 							localPat = await this._database.get(filtered._id)
 						} catch {
+							console.log(`Adding doc ${filtered._id}`)
 							await this._database.put(Object.assign(filtered))
 						}
 						if (localPat) {
+							console.log(`Updating doc ${localPat._id}`)
 							const localRev = localPat.upstreamRev ? +(localPat.upstreamRev.split('-')[0]) : 0
 							const remoteRev = remotePat.rev ? +(remotePat.rev.split('-')[0]) : 0
 							if (localRev < remoteRev) {

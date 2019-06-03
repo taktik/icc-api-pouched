@@ -20,7 +20,7 @@ describe('iccapipouched', () => {
 		})
 	}),
 	describe('syncPatients', function() {
-		this.timeout(60000)
+		this.timeout(120000)
 		it('should sync a list of patients', async function() {
 			const login = 'abdemo'
 			const password = 'knalou'
@@ -34,7 +34,7 @@ describe('iccapipouched', () => {
 			const databaseName = undefined
 			const iccApiPouched = iccapipouched.newIccApiPouched(host, login, password, headers, lastSync, databaseName)
 
-			await iccApiPouched.sync()
+			await iccApiPouched.sync(500)
 
 			const pats = await iccApiPouched.search('du')
 			console.log('Search results', pats)
