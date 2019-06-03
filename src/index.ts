@@ -11,6 +11,7 @@ import {
 	PatientDto,
 	XHR
 } from 'icc-api'
+
 import PouchDB from 'pouchdb'
 import _ from 'lodash'
 
@@ -103,7 +104,8 @@ export namespace iccapipouched {
 		constructor(host: string, username: string, password: string, headers?: { [key: string]: string }, lastSync?: number, localDatabaseName?: string) {
 			this._database = new PouchDB(localDatabaseName || 'icc-local-database')
 
-			const emit = (key: string) => { /* empty */ }
+			const emit = (key: string) => { /* empty */
+			}
 
 			// this._database.get('_design/Patient')
 			const ddoc = {
@@ -149,7 +151,7 @@ export namespace iccapipouched {
 							if (doc.lastName || doc.firstName) {
 								emitNormalizedSubstrings((doc.lastName ? doc.lastName : '') + (doc.firstName ? doc.firstName : ''), doc, latinMap)
 							}
-							if (doc .maidenName && doc.maidenName !== doc.lastName) {
+							if (doc.maidenName && doc.maidenName !== doc.lastName) {
 								emitNormalizedSubstrings(doc.maidenName, doc, latinMap)
 							}
 							if (doc.spouseName && doc.spouseName !== doc.lastName) {
@@ -192,7 +194,7 @@ export namespace iccapipouched {
 			return this._host
 		}
 
-		get headers(): Array < XHR.Header > {
+		get headers(): Array<XHR.Header> {
 			return this._headers
 		}
 
@@ -234,7 +236,7 @@ export namespace iccapipouched {
 		}
 
 		// TODO fix any to PatientStub
-		async search<T>(term: string): Promise < Array<any> > {
+		async search<T>(term: string): Promise<Array<any>> {
 			return this._database.query('Patient/by_searchString', {
 				key: term,
 
@@ -244,7 +246,7 @@ export namespace iccapipouched {
 			)
 		}
 
-		async sync(): Promise < void > {
+		async sync(): Promise<void> {
 			const currentUser = await this._usericc.getCurrentUser()
 			if (currentUser) {
 				const paginator: PaginatorFunction<PatientDto> = async (key: number, docId: string | null, limit: number | undefined) => {
@@ -259,7 +261,9 @@ export namespace iccapipouched {
 
 				const patList = await this.getRowsUsingPagination(paginator)
 				_.sortBy(patList, pat => -(pat.modified || 0)).reduce(async (prev: Promise<void>, remotePat) => {
-					try { await prev } catch (e) {
+					try {
+						await prev
+					} catch (e) {
 						console.log(e)
 					}
 
@@ -288,12 +292,12 @@ export namespace iccapipouched {
 			}
 		}
 
-		async getRowsUsingPagination<X>(paginator: PaginatorFunction < X > , filter ?: (value: X, idx: number, array: Array<X>) => boolean, startIdx ?: number, endIdx ?: number, cache ?: Array<RowsChunk<X>>): Promise < Array < X >> {
+		async getRowsUsingPagination<X>(paginator: PaginatorFunction<X>, filter ?: (value: X, idx: number, array: Array<X>) => boolean, startIdx ?: number, endIdx ?: number, cache ?: Array<RowsChunk<X>>): Promise<Array<X>> {
 			const executePaginator: PaginatorExecutor<X> = async (latestResult: PaginatorResponse<X>, acc: Array<X>, limit: number | undefined) => {
 				const newResult = await paginator(latestResult.nextKey, latestResult.nextDocId, endIdx && startIdx ? endIdx - startIdx : undefined)
 				const rows = (filter ? newResult.rows && newResult.rows.filter(filter) : newResult.rows) || []
 				acc.push(...rows)
-				if (newResult .done || (limit && (acc.length >= limit))) {
+				if (newResult.done || (limit && (acc.length >= limit))) {
 					return {
 						rows: acc,
 						nextKey: newResult.nextKey,
@@ -309,7 +313,7 @@ export namespace iccapipouched {
 				// Go through cache and build a list of existing rows (RowsChunks) and missing rows (MissingRowChunks)
 				// The cache is a sparse structure sorted by index
 				// At first, the cache is empty rows is going to be equal to [] and everything will be missing (see empty rows situation below)
-				const [rows, lastKey, lastDocId, lastEndIdx] = cache.reduce(([rows, lastKey, lastDocId, lastEndIdx, lastTreatedIdx]: [Array<RowsChunk<X> | MissingRowsChunk<X>>, any | null, string | null, number, number] , chunk) => {
+				const [rows, lastKey, lastDocId, lastEndIdx] = cache.reduce(([rows, lastKey, lastDocId, lastEndIdx, lastTreatedIdx]: [Array<RowsChunk<X> | MissingRowsChunk<X>>, any | null, string | null, number, number], chunk) => {
 
 					const startOfZoi = lastTreatedIdx
 					const endOfZoi = endIdx
@@ -410,11 +414,22 @@ export namespace iccapipouched {
 					}, [], missing.missing[1] - missing.lastEndIdx)
 
 					missing.rows = rows.slice(missing.missing[0] - missing.lastEndIdx, missing.missing[1] - missing.lastEndIdx)
-					cache[missing.lastEndIdx] = { rows, startIdx: missing.missing[0], endIdx: missing.missing[1], nextKey, nextDocId }
+					cache[missing.lastEndIdx] = {
+						rows,
+						startIdx: missing.missing[0],
+						endIdx: missing.missing[1],
+						nextKey,
+						nextDocId
+					}
 				}))
 				return _.flatMap(rows, (r: MissingRowsChunk<X> | RowsChunk<X>) => r.rows!!)
 			} else {
-				const { rows } = await executePaginator({ nextKey: null, nextDocId: null, rows: [], done: false }, [], undefined)
+				const { rows } = await executePaginator({
+					nextKey: null,
+					nextDocId: null,
+					rows: [],
+					done: false
+				}, [], undefined)
 				return rows
 			}
 		}
@@ -423,7 +438,7 @@ export namespace iccapipouched {
 	/*
 		Factory method
 	*/
-export function newIccApiPouched(host: string, username: string, password: string, headers?: { [key: string]: string }, lastSync?: number, localDatabaseName?: string): IccApiPouched {
-	return new IccApiPouchedImpl(host, username, password, headers, lastSync, localDatabaseName)
-}
+	export function newIccApiPouched(host: string, username: string, password: string, headers?: { [key: string]: string }, lastSync?: number, localDatabaseName?: string): IccApiPouched {
+		return new IccApiPouchedImpl(host, username, password, headers, lastSync, localDatabaseName)
+	}
 }
