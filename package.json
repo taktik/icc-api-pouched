@@ -41,7 +41,7 @@
 		"typescript": "^3.4.5"
 	},
 	"dependencies": {
-		"icc-api": "^1.0.140",
+		"icc-api": "^1.0.141",
 		"lodash": "^4.17.11",
 		"moment": "^2.24.0",
 		"pouchdb": "^7.0.0"
