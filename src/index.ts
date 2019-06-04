@@ -56,6 +56,16 @@ export namespace iccapipouched {
 	}
 
 	export interface IccApiPouched {
+		readonly host: string
+		readonly headers: { [key: string]: string }
+		readonly database: PouchDB.Database
+		readonly lastSync: number
+		readonly patienticc: IccPatientXApi
+		readonly calendaritemicc: iccCalendarItemApi
+		readonly usericc: IccUserXApi
+		readonly hcpartyicc: IccHcpartyXApi
+		readonly contacticc: IccContactXApi
+
 		sync(max?: number): Promise<void>
 
 		search<T>(term: string): Promise<Array<any>>
