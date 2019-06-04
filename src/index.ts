@@ -178,7 +178,8 @@ export namespace iccapipouched {
 					}
 				}).catch(() => {
 					console.log('Creating ddoc')
-					this._database.put(ddoc).catch((e: any) => console.log(e))
+					// TODO: fix any (definition in pouchDB is bad)
+					this._database.put(ddoc as any).catch((e: any) => console.log(e))
 				})
 
 			this._host = host
