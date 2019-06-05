@@ -252,10 +252,11 @@ export namespace iccapipouched {
 		}
 
 		// TODO fix any to PatientStub
-		async search<T>(term: string): Promise<Array<any>> {
+		async search<T>(term: string, limit?: number): Promise<Array<any>> {
 			return this._database.query('Patient/by_search_string', {
 				startkey: term,
 				endkey: term + '\ufff0',
+				limit: limit || 100,
 				include_docs: true
 			}).then(result =>
 				result.rows.map(r => r.doc)
