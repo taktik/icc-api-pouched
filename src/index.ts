@@ -11,7 +11,7 @@ import {
 	PatientDto
 } from 'icc-api'
 
-import * as PouchDB from 'pouchdb'
+import PouchDB from 'pouchdb'
 import * as _ from 'lodash'
 
 import { IccCodeXApi } from 'icc-api/dist/icc-x-api/icc-code-x-api'
