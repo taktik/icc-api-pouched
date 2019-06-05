@@ -51,6 +51,10 @@
 		"moment": "^2.24.0",
 		"pouchdb": "^7.0.0"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/taktik/icc-api-pouched.git"
+	},
 	"prettier": {
 		"semi": false,
 		"printWidth": 100
