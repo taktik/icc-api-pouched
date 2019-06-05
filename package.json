@@ -8,7 +8,9 @@
 		"build": "npm run tslint && tsc",
 		"tslint": "tslint src/*",
 		"test:debug": "karma start",
-		"test": "karma start  --single-run"
+		"test": "karma start  --single-run",
+		"prepare": "rimraf dist && npm run build",
+		"precommit": "pretty-quick --staged"
 	},
 	"keywords": [
 		"icc",
@@ -38,12 +40,19 @@
 		"sinon": "^7.3.1",
 		"tslint": "^5.16.0",
 		"tslint-config-standard": "^8.0.1",
-		"typescript": "^3.4.5"
+		"typescript": "^3.4.5",
+		"prettier": "^1.13.5",
+		"pretty-quick": "^1.6.0",
+		"rimraf": "^2.6.2"
 	},
 	"dependencies": {
 		"icc-api": "^1.0.143",
 		"lodash": "^4.17.11",
 		"moment": "^2.24.0",
 		"pouchdb": "^7.0.0"
+	},
+	"prettier": {
+		"semi": false,
+		"printWidth": 100
 	}
 }
