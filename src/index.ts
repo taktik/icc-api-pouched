@@ -314,6 +314,10 @@ export namespace iccapipouched {
 			return this._contacticc
 		}
 
+		get cryptoicc(): IccCryptoXApi {
+			return this._cryptoicc
+		}
+
 		async getPatient(id: string) {
 			const currentUser = await this._usericc.getCurrentUser()
 			if (!currentUser) {
