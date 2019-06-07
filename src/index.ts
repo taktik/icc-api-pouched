@@ -94,7 +94,6 @@ export namespace iccapipouched {
 	class IccApiPouchedImpl implements IccApiPouched {
 		private readonly _host: string
 		private readonly _headers: { [key: string]: string }
-		private readonly _database: PouchDB.Database
 		private readonly _lastSync: number
 
 		private readonly _accesslogicc: iccAccesslogApi
@@ -117,6 +116,8 @@ export namespace iccapipouched {
 		private readonly _patienticc: IccPatientXApi
 		private readonly _messageicc: IccMessageXApi
 
+		private _database: PouchDB.Database
+
 		constructor(
 			host: string,
 			username: string,
@@ -125,7 +126,78 @@ export namespace iccapipouched {
 			lastSync?: number,
 			localDatabaseName?: string
 		) {
-			this._database = new PouchDB(localDatabaseName || 'icc-local-database')
+			this._host = host
+			this._headers = Object.assign(
+				{ Authorization: `Basic ${btoa(`${username}:${password}`)}` },
+				headers || {}
+			)
+			this._lastSync = lastSync || 0
+			this._accesslogicc = new iccAccesslogApi(this._host, this._headers)
+			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
+			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
+			this._calendaritemtypeicc = new iccCalendarItemTypeApi(this._host, this._headers)
+			this._usericc = new IccUserXApi(this._host, this._headers)
+			this._codeicc = new IccCodeXApi(this._host, this._headers)
+			this._hcpartyiccLight = new iccHcpartyApi(this._host, this._headers)
+			this._hcpartyicc = new IccHcpartyXApi(this._host, this._headers)
+			this._cryptoicc = new IccCryptoXApi(this._host, this._headers, this._hcpartyicc)
+			this._calendaritemicc = new IccCalendarItemXApi(
+				this._host,
+				this._headers,
+				this._cryptoicc
+			)
+			this._receipticc = new IccReceiptXApi(this._host, this._headers, this._cryptoicc)
+			this._contacticc = new IccContactXApi(this._host, this._headers, this._cryptoicc)
+			this._documenticc = new IccDocumentXApi(this._host, this._headers, this._cryptoicc)
+			this._formicc = new IccFormXApi(this._host, this._headers, this._cryptoicc)
+			this._helementicc = new IccHelementXApi(this._host, this._headers, this._cryptoicc)
+			this._invoiceicc = new IccInvoiceXApi(
+				this._host,
+				this._headers,
+				this._cryptoicc,
+				this._entityreficc
+			)
+			this._classificationicc = new IccClassificationXApi(
+				this._host,
+				this._headers,
+				this._cryptoicc
+			)
+			this._patienticc = new IccPatientXApi(
+				this._host,
+				this._headers,
+				this._cryptoicc,
+				this._contacticc,
+				this._helementicc,
+				this._invoiceicc,
+				this._documenticc,
+				this._hcpartyicc,
+				this._classificationicc
+			)
+			this._messageicc = new IccMessageXApi(
+				this._host,
+				this._headers,
+				this._cryptoicc,
+				this._insuranceicc,
+				this._entityreficc,
+				this._invoiceicc,
+				this._documenticc,
+				this._receipticc,
+				this._patienticc
+			)
+		}
+
+		async init(localDatabaseName: string) {
+			if (!localDatabaseName) {
+				const user = await this.usericc.getCurrentUser()
+				if (!user) {
+					throw new Error(
+						'A valid user must be set to init a pouchdb structure when no database name is set'
+					)
+				}
+				localDatabaseName = `icc-local-database.${user.id}`
+			}
+
+			this._database = new PouchDB(localDatabaseName)
 
 			const ddoc = {
 				_id: '_design/Patient',
@@ -193,68 +265,9 @@ export namespace iccapipouched {
 				})
 				.catch(() => {
 					console.log('Creating ddoc')
-					// TODO: fix any (definition in pouchDB is bad)
+					// TODO : fix any (definition in pouchDB is bad)
 					this._database.put(ddoc as any).catch((e: any) => console.log(e))
 				})
-
-			this._host = host
-			this._headers = Object.assign(
-				{ Authorization: `Basic ${btoa(`${username}:${password}`)}` },
-				headers || {}
-			)
-			this._lastSync = lastSync || 0
-			this._accesslogicc = new iccAccesslogApi(this._host, this._headers)
-			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
-			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
-			this._calendaritemtypeicc = new iccCalendarItemTypeApi(this._host, this._headers)
-			this._usericc = new IccUserXApi(this._host, this._headers)
-			this._codeicc = new IccCodeXApi(this._host, this._headers)
-			this._hcpartyiccLight = new iccHcpartyApi(this._host, this._headers)
-			this._hcpartyicc = new IccHcpartyXApi(this._host, this._headers)
-			this._cryptoicc = new IccCryptoXApi(this._host, this._headers, this._hcpartyicc)
-			this._calendaritemicc = new IccCalendarItemXApi(
-				this._host,
-				this._headers,
-				this._cryptoicc
-			)
-			this._receipticc = new IccReceiptXApi(this._host, this._headers, this._cryptoicc)
-			this._contacticc = new IccContactXApi(this._host, this._headers, this._cryptoicc)
-			this._documenticc = new IccDocumentXApi(this._host, this._headers, this._cryptoicc)
-			this._formicc = new IccFormXApi(this._host, this._headers, this._cryptoicc)
-			this._helementicc = new IccHelementXApi(this._host, this._headers, this._cryptoicc)
-			this._invoiceicc = new IccInvoiceXApi(
-				this._host,
-				this._headers,
-				this._cryptoicc,
-				this._entityreficc
-			)
-			this._classificationicc = new IccClassificationXApi(
-				this._host,
-				this._headers,
-				this._cryptoicc
-			)
-			this._patienticc = new IccPatientXApi(
-				this._host,
-				this._headers,
-				this._cryptoicc,
-				this._contacticc,
-				this._helementicc,
-				this._invoiceicc,
-				this._documenticc,
-				this._hcpartyicc,
-				this._classificationicc
-			)
-			this._messageicc = new IccMessageXApi(
-				this._host,
-				this._headers,
-				this._cryptoicc,
-				this._insuranceicc,
-				this._entityreficc,
-				this._invoiceicc,
-				this._documenticc,
-				this._receipticc,
-				this._patienticc
-			)
 		}
 
 		get host(): string {
