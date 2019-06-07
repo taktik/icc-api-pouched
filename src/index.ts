@@ -26,6 +26,8 @@ import { IccReceiptXApi } from 'icc-api/dist/icc-x-api/icc-receipt-x-api'
 import { IccUserXApi } from 'icc-api/dist/icc-x-api/icc-user-x-api'
 import { IccInvoiceXApi } from 'icc-api/dist/icc-x-api/icc-invoice-x-api'
 import { IccMessageXApi } from 'icc-api/dist/icc-x-api/icc-message-x-api'
+import { Moment } from 'moment'
+import moment = require('moment')
 
 export namespace iccapipouched {
 	type PaginatorFunction<X> = (
@@ -78,6 +80,8 @@ export namespace iccapipouched {
 		sync(max?: number): Promise<void>
 
 		search<T>(term: string, limit: number): Promise<Array<any>>
+
+		moment(timestamp: number | string): Moment | null
 	}
 
 	class PatientStubCore {
@@ -618,6 +622,19 @@ export namespace iccapipouched {
 					undefined
 				)
 				return rows
+			}
+		}
+
+		moment(epochOrLongCalendar: number | string): Moment | null {
+			if (!epochOrLongCalendar && epochOrLongCalendar !== 0) {
+				return null
+			}
+			if (epochOrLongCalendar >= 18000101 && epochOrLongCalendar < 25400000) {
+				return moment('' + epochOrLongCalendar, 'YYYYMMDD')
+			} else if (epochOrLongCalendar >= 18000101000000) {
+				return moment('' + epochOrLongCalendar, 'YYYYMMDDHHmmss')
+			} else {
+				return moment(epochOrLongCalendar) // epoch or string
 			}
 		}
 	}
