@@ -75,7 +75,7 @@ export namespace iccapipouched {
 
 		sync(max?: number): Promise<void>
 
-		search<T>(term: string): Promise<Array<any>>
+		search<T>(term: string, limit: number): Promise<Array<any>>
 	}
 
 	class PatientStubCore {
