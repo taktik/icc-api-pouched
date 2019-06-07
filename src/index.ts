@@ -66,12 +66,14 @@ export namespace iccapipouched {
 		readonly host: string
 		readonly headers: { [key: string]: string }
 		readonly database: PouchDB.Database
-		readonly lastSync: number
+		readonly latestSync: number
 		readonly patienticc: IccPatientXApi
 		readonly calendaritemicc: iccCalendarItemApi
 		readonly usericc: IccUserXApi
 		readonly hcpartyicc: IccHcpartyXApi
 		readonly contacticc: IccContactXApi
+
+		init(localDatabaseName: string): Promise<void>
 
 		sync(max?: number): Promise<void>
 
@@ -94,7 +96,7 @@ export namespace iccapipouched {
 	class IccApiPouchedImpl implements IccApiPouched {
 		private readonly _host: string
 		private readonly _headers: { [key: string]: string }
-		private readonly _lastSync: number
+		private readonly _latestSync: number
 
 		private readonly _accesslogicc: iccAccesslogApi
 		private readonly _insuranceicc: iccInsuranceApi
@@ -116,22 +118,21 @@ export namespace iccapipouched {
 		private readonly _patienticc: IccPatientXApi
 		private readonly _messageicc: IccMessageXApi
 
-		private _database: PouchDB.Database
+		private _database: PouchDB.Database | null = null
 
 		constructor(
 			host: string,
 			username: string,
 			password: string,
 			headers?: { [key: string]: string },
-			lastSync?: number,
-			localDatabaseName?: string
+			latestSync?: number
 		) {
 			this._host = host
 			this._headers = Object.assign(
 				{ Authorization: `Basic ${btoa(`${username}:${password}`)}` },
 				headers || {}
 			)
-			this._lastSync = lastSync || 0
+			this._latestSync = latestSync || 0
 			this._accesslogicc = new iccAccesslogApi(this._host, this._headers)
 			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
 			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
@@ -254,19 +255,19 @@ export namespace iccapipouched {
 				}
 			}
 
-			this._database
+			this.database
 				.get(ddoc._id)
 				.then((dd: any) => {
 					if (!_.isEqual(ddoc.views, dd.views)) {
 						const newDdoc = Object.assign(ddoc, { _rev: dd._rev })
 						console.log('Updating Design doc to', newDdoc)
-						return this._database.put(newDdoc).catch(e => console.log(e))
+						return this.database.put(newDdoc).catch(e => console.log(e))
 					}
 				})
 				.catch(() => {
 					console.log('Creating ddoc')
 					// TODO : fix any (definition in pouchDB is bad)
-					this._database.put(ddoc as any).catch((e: any) => console.log(e))
+					this.database.put(ddoc as any).catch((e: any) => console.log(e))
 				})
 		}
 
@@ -279,11 +280,14 @@ export namespace iccapipouched {
 		}
 
 		get database(): PouchDB.Database {
+			if (!this._database) {
+				throw new Error('You must call init on iccapi before using the Pouchdb database')
+			}
 			return this._database
 		}
 
-		get lastSync(): number {
-			return this._lastSync
+		get latestSync(): number {
+			return this._latestSync
 		}
 
 		get patienticc(): IccPatientXApi {
@@ -317,7 +321,7 @@ export namespace iccapipouched {
 
 		// TODO fix any to PatientStub
 		async search<T>(term: string, limit?: number): Promise<Array<any>> {
-			return this._database
+			return this.database
 				.query('Patient/by_search_string', {
 					startkey: term,
 					endkey: term + '\ufff0',
@@ -337,7 +341,7 @@ export namespace iccapipouched {
 				) => {
 					const pl = await this.patienticc.listOfPatientsModifiedAfterWithUser(
 						currentUser,
-						this.lastSync,
+						this.latestSync,
 						key,
 						docId || undefined,
 						limit || 100
@@ -384,10 +388,10 @@ export namespace iccapipouched {
 						if (filtered._id) {
 							let localPat: any = null
 							try {
-								localPat = await this._database.get(filtered._id)
+								localPat = await this.database.get(filtered._id)
 							} catch {
 								console.log(`Adding doc ${filtered._id}`)
-								await this._database.put(Object.assign(filtered))
+								await this.database.put(Object.assign(filtered))
 							}
 							if (localPat) {
 								console.log(`Updating doc ${localPat._id}`)
@@ -396,7 +400,7 @@ export namespace iccapipouched {
 									: 0
 								const remoteRev = remotePat.rev ? +remotePat.rev.split('-')[0] : 0
 								if (localRev < remoteRev) {
-									await this._database.put(
+									await this.database.put(
 										Object.assign(filtered, { _rev: localPat._rev })
 									)
 								}
@@ -626,9 +630,8 @@ export namespace iccapipouched {
 		username: string,
 		password: string,
 		headers?: { [key: string]: string },
-		lastSync?: number,
-		localDatabaseName?: string
+		latestSync?: number
 	): IccApiPouched {
-		return new IccApiPouchedImpl(host, username, password, headers, lastSync, localDatabaseName)
+		return new IccApiPouchedImpl(host, username, password, headers, latestSync)
 	}
 }
