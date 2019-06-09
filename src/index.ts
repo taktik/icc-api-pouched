@@ -210,12 +210,12 @@ export namespace iccapipouched {
 					by_search_string: {
 						map:
 							'function(doc) {\n' +
-							'const emitNormalizedSubstrings = (txt, doc, latinMap) => {\n' +
+							'const emitNormalizedSubstrings = (txt, doc, latinMap, acc) => {\n' +
 							'let r = txt.toLowerCase().replace(/[^A-Za-z0-9]/g, a => {\n' +
 							"return latinMap[a] || ''\n" +
 							'})\n' +
 							'for (let i = 0; i <= r.length - 3; i++) {\n' +
-							'emit((r.substr(i, r.length - i)))\n' +
+							'acc[r.substr(i, r.length - i)] = 1\n' +
 							'}\n' +
 							'}\n' +
 							"const latinMap = {'á': 'a','ă': 'a','ắ': 'a','ặ': 'a','ằ': 'a','ẳ': 'a','ẵ': 'a','ǎ': 'a','â': 'a','ấ': 'a','ậ': 'a','ầ': 'a','ẩ': 'a','ẫ': 'a','ä': 'a','ǟ': 'a','ȧ': 'a',\n" +
@@ -245,15 +245,22 @@ export namespace iccapipouched {
 							"'ỷ': 'y','ỿ': 'y','ȳ': 'y','ẙ': 'y','ɏ': 'y','ỹ': 'y','ź': 'z','ž': 'z','ẑ': 'z','ʑ': 'z','ⱬ': 'z','ż': 'z','ẓ': 'z','ȥ': 'z','ẕ': 'z','ᵶ': 'z','ᶎ': 'z',\n" +
 							"'ʐ': 'z','ƶ': 'z','ɀ': 'z','ﬀ': 'ff','ﬃ': 'ffi','ﬄ': 'ffl','ﬁ': 'fi','ﬂ': 'fl','ĳ': 'ij','œ': 'oe','ﬆ': 'st','ₐ': 'a','ₑ': 'e','ᵢ': 'i','ⱼ': 'j',\n" +
 							"'ₒ': 'o','ᵣ': 'r','ᵤ': 'u','ᵥ': 'v','ₓ': 'x'}\n" +
+							'const acc = {}\n' +
 							'if (doc.lastName || doc.firstName) {\n' +
-							"emitNormalizedSubstrings((doc.lastName ? doc.lastName : '') + (doc.firstName ? doc.firstName : ''), doc, latinMap)\n" +
+							"emitNormalizedSubstrings((doc.lastName ? doc.lastName : '') + (doc.firstName ? doc.firstName : ''), doc, latinMap, acc)\n" +
 							'}\n' +
 							'if (doc.maidenName && doc.maidenName !== doc.lastName) {\n' +
-							'emitNormalizedSubstrings(doc.maidenName, doc, latinMap)\n' +
+							'emitNormalizedSubstrings(doc.maidenName, doc, latinMap, acc)\n' +
 							'}\n' +
 							'if (doc.spouseName && doc.spouseName !== doc.lastName) {\n' +
-							'emitNormalizedSubstrings(doc.spouseName, doc, latinMap)\n' +
+							'emitNormalizedSubstrings(doc.spouseName, doc, latinMap, acc)\n' +
 							'}\n' +
+							'const terms = Object.keys(acc)\n' +
+							'terms.sort().forEach(function(t, idx) {\n' +
+							'if (idx === terms.length - 1 || !(terms[idx + 1].indexOf(t) === 0)) {\n' +
+							'emit(t, 1)\n' +
+							'}\n' +
+							'})' +
 							'}'
 					}
 				}
@@ -336,7 +343,13 @@ export namespace iccapipouched {
 					limit: limit || 100,
 					include_docs: true
 				})
-				.then(result => result.rows.map(r => r.doc))
+				.then(result => {
+					return result.rows.map(
+						r =>
+							r.doc &&
+							new PatientDto(Object.assign(r.doc, { id: r.doc._id, rev: undefined }))
+					)
+				})
 		}
 
 		async sync(max = 10000): Promise<void> {
