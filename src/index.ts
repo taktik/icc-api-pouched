@@ -1,9 +1,6 @@
 import {
 	AddressDto,
 	iccAccesslogApi,
-	iccCalendarItemApi,
-	iccCalendarItemTypeApi,
-	IccCalendarItemXApi,
 	IccClassificationXApi,
 	iccEntityrefApi,
 	iccHcpartyApi,
@@ -15,6 +12,7 @@ import PouchDB from 'pouchdb'
 import * as _ from 'lodash'
 
 import { IccCodeXApi } from 'icc-api/dist/icc-x-api/icc-code-x-api'
+import { IccCalendarItemXApi } from 'icc-api/dist/icc-x-api/icc-calendar-item-x-api'
 import { IccContactXApi } from 'icc-api/dist/icc-x-api/icc-contact-x-api'
 import { IccCryptoXApi } from 'icc-api/dist/icc-x-api/icc-crypto-x-api'
 import { IccDocumentXApi } from 'icc-api/dist/icc-x-api/icc-document-x-api'
@@ -70,7 +68,7 @@ export namespace iccapipouched {
 		readonly database: PouchDB.Database
 		readonly latestSync: number
 		readonly patienticc: IccPatientXApi
-		readonly calendaritemicc: iccCalendarItemApi
+		readonly calendaritemicc: IccCalendarItemXApi
 		readonly usericc: IccUserXApi
 		readonly hcpartyicc: IccHcpartyXApi
 		readonly contacticc: IccContactXApi
@@ -105,7 +103,7 @@ export namespace iccapipouched {
 		private readonly _accesslogicc: iccAccesslogApi
 		private readonly _insuranceicc: iccInsuranceApi
 		private readonly _entityreficc: iccEntityrefApi
-		private readonly _calendaritemicc: iccCalendarItemApi
+		private readonly _calendaritemicc: iccCalendarItemXApi
 		private readonly _calendaritemtypeicc: iccCalendarItemTypeApi
 		private readonly _usericc: IccUserXApi
 		private readonly _codeicc: IccCodeXApi
@@ -305,7 +303,7 @@ export namespace iccapipouched {
 			return this._patienticc
 		}
 
-		get calendaritemicc(): iccCalendarItemApi {
+		get calendaritemicc(): IccCalendarItemXApi {
 			return this._calendaritemicc
 		}
 
