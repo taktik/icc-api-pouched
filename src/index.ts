@@ -104,7 +104,7 @@ export namespace iccapipouched {
 		private readonly _accesslogicc: iccAccesslogApi
 		private readonly _insuranceicc: iccInsuranceApi
 		private readonly _entityreficc: iccEntityrefApi
-		private readonly _calendaritemicc: iccCalendarItemXApi
+		private readonly _calendaritemicc: IccCalendarItemXApi
 		private readonly _calendaritemtypeicc: iccCalendarItemTypeApi
 		private readonly _usericc: IccUserXApi
 		private readonly _codeicc: IccCodeXApi
