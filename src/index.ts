@@ -1,6 +1,7 @@
 import {
 	AddressDto,
 	iccAccesslogApi,
+	iccCalendarItemTypeApi,
 	IccClassificationXApi,
 	iccEntityrefApi,
 	iccHcpartyApi,
