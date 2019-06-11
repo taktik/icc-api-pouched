@@ -128,7 +128,8 @@ export namespace iccapipouched {
 			username: string,
 			password: string,
 			headers?: { [key: string]: string },
-			latestSync?: number
+			latestSync?: number,
+			cryptedKeys?: { [key: string]: Array<string> }
 		) {
 			this._host = host
 			this._headers = Object.assign(
@@ -175,7 +176,8 @@ export namespace iccapipouched {
 				this._invoiceicc,
 				this._documenticc,
 				this._hcpartyicc,
-				this._classificationicc
+				this._classificationicc,
+				(cryptedKeys && cryptedKeys['patient']) || undefined
 			)
 			this._messageicc = new IccMessageXApi(
 				this._host,
@@ -663,8 +665,9 @@ export namespace iccapipouched {
 		username: string,
 		password: string,
 		headers?: { [key: string]: string },
-		latestSync?: number
+		latestSync?: number,
+		cryptedKeys?: { [key: string]: Array<string> }
 	): IccApiPouched {
-		return new IccApiPouchedImpl(host, username, password, headers, latestSync)
+		return new IccApiPouchedImpl(host, username, password, headers, latestSync, cryptedKeys)
 	}
 }
