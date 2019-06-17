@@ -74,7 +74,7 @@ export namespace iccapipouched {
 		readonly hcpartyicc: IccHcpartyXApi
 		readonly contacticc: IccContactXApi
 
-		init(localDatabaseName: string): Promise<void>
+		init(localDatabaseName?: string): Promise<void>
 
 		sync(max?: number): Promise<void>
 
@@ -192,7 +192,7 @@ export namespace iccapipouched {
 			)
 		}
 
-		async init(localDatabaseName: string) {
+		async init(localDatabaseName?: string) {
 			if (!localDatabaseName) {
 				const user = await this.usericc.getCurrentUser()
 				if (!user) {
