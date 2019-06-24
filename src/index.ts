@@ -6,7 +6,8 @@ import {
 	iccEntityrefApi,
 	iccHcpartyApi,
 	iccInsuranceApi,
-	PatientDto
+	PatientDto,
+	UserDto
 } from 'icc-api'
 
 import PouchDB from 'pouchdb'
@@ -669,5 +670,9 @@ export namespace iccapipouched {
 		cryptedKeys?: { [key: string]: Array<string> }
 	): IccApiPouched {
 		return new IccApiPouchedImpl(host, username, password, headers, latestSync, cryptedKeys)
+	}
+
+	export function loadCurrentUserWithSessionCookie(host: string): Promise<UserDto> {
+		return new IccUserXApi(host, {}).getCurrentUser()
 	}
 }
