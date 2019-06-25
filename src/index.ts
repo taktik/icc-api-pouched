@@ -6,6 +6,7 @@ import {
 	iccEntityrefApi,
 	iccHcpartyApi,
 	iccInsuranceApi,
+	iccPatientApi,
 	PatientDto,
 	UserDto
 } from 'icc-api'
@@ -146,7 +147,12 @@ export namespace iccapipouched {
 			this._codeicc = new IccCodeXApi(this._host, this._headers)
 			this._hcpartyiccLight = new iccHcpartyApi(this._host, this._headers)
 			this._hcpartyicc = new IccHcpartyXApi(this._host, this._headers)
-			this._cryptoicc = new IccCryptoXApi(this._host, this._headers, this._hcpartyicc)
+			this._cryptoicc = new IccCryptoXApi(
+				this._host,
+				this._headers,
+				this._hcpartyicc,
+				new iccPatientApi(this._host, this._headers)
+			)
 			this._calendaritemicc = new IccCalendarItemXApi(
 				this._host,
 				this._headers,
