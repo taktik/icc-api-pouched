@@ -414,7 +414,7 @@ export namespace iccapipouched {
 							{ _id: remotePat.id, upstreamRev: remotePat.rev }
 						)
 
-						if (filtered._id) {
+						if (filtered._id && (filtered as any).lastName) {
 							let localPat: any = null
 							try {
 								localPat = await this.database.get(filtered._id)
