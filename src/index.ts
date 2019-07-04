@@ -78,7 +78,7 @@ export namespace iccapipouched {
 
 		init(localDatabaseName?: string): Promise<void>
 
-		sync(max?: number): Promise<void>
+		sync(crypto: IccCryptoXApi, max?: number): Promise<void>
 
 		search<T>(term: string, limit: number): Promise<Array<any>>
 
@@ -360,7 +360,7 @@ export namespace iccapipouched {
 				})
 		}
 
-		async sync(max = 10000): Promise<void> {
+		async sync(crypto: IccCryptoXApi, max = 10000): Promise<void> {
 			const currentUser = await this._usericc.getCurrentUser()
 			if (currentUser) {
 				const paginator: PaginatorFunction<PatientDto> = async (
@@ -413,6 +413,35 @@ export namespace iccapipouched {
 								}, {}),
 							{ _id: remotePat.id, upstreamRev: remotePat.rev }
 						)
+
+						if (
+							remotePat.publicKey &&
+							(!remotePat.delegations || !remotePat.delegations[remotePat.id!])
+						) {
+							try {
+								const [
+									delSfks,
+									ecKeys
+								] = await crypto.extractDelegationsSFKsAndEncryptionSKs(
+									remotePat,
+									currentUser.healthcarePartyId
+								)
+								remotePat =
+									(await this.patienticc.modifyPatientWithUser(
+										currentUser,
+										await crypto.addDelegationsAndEncryptionKeys(
+											null,
+											remotePat,
+											currentUser.healthcarePartyId,
+											remotePat.id!,
+											delSfks[0],
+											ecKeys[0]
+										)
+									)) || remotePat
+							} catch (e) {
+								console.warn('Cannot share patient', remotePat.id)
+							}
+						}
 
 						if (filtered._id && (filtered as any).lastName) {
 							let localPat: any = null
