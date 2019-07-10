@@ -1,6 +1,6 @@
 {
 	"name": "icc-api-pouched",
-	"version": "1.0.30",
+	"version": "1.0.33",
 	"description": "iCure Cloud api and PouchDB",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",

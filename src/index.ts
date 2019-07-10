@@ -1,6 +1,5 @@
 import {
 	AddressDto,
-	iccAccesslogApi,
 	iccCalendarItemTypeApi,
 	IccClassificationXApi,
 	iccEntityrefApi,
@@ -27,7 +26,9 @@ import { IccReceiptXApi } from 'icc-api/dist/icc-x-api/icc-receipt-x-api'
 import { IccUserXApi } from 'icc-api/dist/icc-x-api/icc-user-x-api'
 import { IccInvoiceXApi } from 'icc-api/dist/icc-x-api/icc-invoice-x-api'
 import { IccMessageXApi } from 'icc-api/dist/icc-x-api/icc-message-x-api'
+
 import { Moment } from 'moment'
+import { IccAccesslogXApi } from 'icc-api/dist/icc-x-api/icc-accesslog-x-api'
 import moment = require('moment')
 
 export namespace iccapipouched {
@@ -75,6 +76,7 @@ export namespace iccapipouched {
 		readonly usericc: IccUserXApi
 		readonly hcpartyicc: IccHcpartyXApi
 		readonly contacticc: IccContactXApi
+		readonly accesslogicc: IccAccesslogXApi
 
 		init(localDatabaseName?: string): Promise<void>
 
@@ -103,7 +105,6 @@ export namespace iccapipouched {
 		private readonly _headers: { [key: string]: string }
 		private readonly _latestSync: number
 
-		private readonly _accesslogicc: iccAccesslogApi
 		private readonly _insuranceicc: iccInsuranceApi
 		private readonly _entityreficc: iccEntityrefApi
 		private readonly _calendaritemicc: IccCalendarItemXApi
@@ -113,6 +114,7 @@ export namespace iccapipouched {
 		private readonly _hcpartyiccLight: iccHcpartyApi
 		private readonly _hcpartyicc: IccHcpartyXApi
 		private readonly _cryptoicc: IccCryptoXApi
+		private readonly _accesslogicc: IccAccesslogXApi
 		private readonly _receipticc: IccReceiptXApi
 		private readonly _contacticc: IccContactXApi
 		private readonly _documenticc: IccDocumentXApi
@@ -139,7 +141,6 @@ export namespace iccapipouched {
 				headers || {}
 			)
 			this._latestSync = latestSync || 0
-			this._accesslogicc = new iccAccesslogApi(this._host, this._headers)
 			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
 			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
 			this._calendaritemtypeicc = new iccCalendarItemTypeApi(this._host, this._headers)
@@ -153,6 +154,7 @@ export namespace iccapipouched {
 				this._hcpartyicc,
 				new iccPatientApi(this._host, this._headers)
 			)
+			this._accesslogicc = new IccAccesslogXApi(this._host, this._headers, this._cryptoicc)
 			this._calendaritemicc = new IccCalendarItemXApi(
 				this._host,
 				this._headers,
@@ -331,6 +333,10 @@ export namespace iccapipouched {
 
 		get cryptoicc(): IccCryptoXApi {
 			return this._cryptoicc
+		}
+
+		get accesslogicc(): IccAccesslogXApi {
+			return this._accesslogicc
 		}
 
 		async getPatient(id: string) {
