@@ -1,6 +1,6 @@
 {
 	"name": "icc-api-pouched",
-	"version": "1.0.36",
+	"version": "1.0.35",
 	"description": "iCure Cloud api and PouchDB",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -36,6 +36,7 @@
 		"karma-mocha": "^1.3.0",
 		"karma-typescript": "^4.1.0",
 		"karma-typescript-es6-transform": "^4.1.0",
+		"mixin-deep": "^1.3.2",
 		"mocha": "^6.1.4",
 		"sinon": "^7.3.1",
 		"tslint": "^5.16.0",
@@ -47,7 +48,7 @@
 	},
 	"dependencies": {
 		"icc-api": "^1.0.162",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.12",
 		"moment": "^2.24.0",
 		"pouchdb": "^7.0.0"
 	},
