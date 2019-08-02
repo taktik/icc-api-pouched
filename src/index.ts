@@ -6,6 +6,8 @@ import {
 	iccHcpartyApi,
 	iccInsuranceApi,
 	iccPatientApi,
+	iccTimeTableApi,
+	IccTimeTableXApi,
 	PatientDto,
 	UserDto
 } from 'icc-api'
@@ -73,6 +75,7 @@ export namespace iccapipouched {
 		readonly latestSync: number
 		readonly patienticc: IccPatientXApi
 		readonly calendaritemicc: IccCalendarItemXApi
+		readonly timetableicc: IccTimeTableXApi
 		readonly usericc: IccUserXApi
 		readonly hcpartyicc: IccHcpartyXApi
 		readonly contacticc: IccContactXApi
@@ -109,6 +112,7 @@ export namespace iccapipouched {
 		private readonly _entityreficc: iccEntityrefApi
 		private readonly _calendaritemicc: IccCalendarItemXApi
 		private readonly _calendaritemtypeicc: iccCalendarItemTypeApi
+		private readonly _timetableicc: IccTimeTableXApi
 		private readonly _usericc: IccUserXApi
 		private readonly _codeicc: IccCodeXApi
 		private readonly _hcpartyiccLight: iccHcpartyApi
@@ -154,6 +158,7 @@ export namespace iccapipouched {
 				this._hcpartyicc,
 				new iccPatientApi(this._host, this._headers)
 			)
+			this._timetableicc = new IccTimeTableXApi(this._host, this._headers, this._cryptoicc)
 			this._accesslogicc = new IccAccesslogXApi(this._host, this._headers, this._cryptoicc)
 			this._calendaritemicc = new IccCalendarItemXApi(
 				this._host,
@@ -317,6 +322,10 @@ export namespace iccapipouched {
 
 		get calendaritemicc(): IccCalendarItemXApi {
 			return this._calendaritemicc
+		}
+
+		get timetableicc(): IccTimeTableXApi {
+			return this._timetableicc
 		}
 
 		get usericc(): IccUserXApi {
