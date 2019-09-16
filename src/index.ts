@@ -1,5 +1,6 @@
 import {
 	AddressDto,
+	iccAuthApi,
 	iccCalendarItemTypeApi,
 	IccClassificationXApi,
 	iccEntityrefApi,
@@ -108,6 +109,7 @@ export namespace iccapipouched {
 		private readonly _headers: { [key: string]: string }
 		private readonly _latestSync: number
 
+		private readonly _authicc: iccAuthApi
 		private readonly _insuranceicc: iccInsuranceApi
 		private readonly _entityreficc: iccEntityrefApi
 		private readonly _calendaritemicc: IccCalendarItemXApi
@@ -146,6 +148,7 @@ export namespace iccapipouched {
 			)
 			this._latestSync = latestSync || 0
 			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
+			this._authicc = new iccAuthApi(this._host, this._headers)
 			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
 			this._calendaritemtypeicc = new iccCalendarItemTypeApi(this._host, this._headers)
 			this._usericc = new IccUserXApi(this._host, this._headers)
@@ -314,6 +317,10 @@ export namespace iccapipouched {
 
 		get latestSync(): number {
 			return this._latestSync
+		}
+
+		get authicc(): iccAuthApi {
+			return this._authicc
 		}
 
 		get patienticc(): IccPatientXApi {
