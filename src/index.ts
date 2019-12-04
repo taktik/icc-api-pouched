@@ -195,6 +195,7 @@ export namespace iccapipouched {
 				this._documenticc,
 				this._hcpartyicc,
 				this._classificationicc,
+				this._calendaritemicc,
 				(cryptedKeys && cryptedKeys['patient']) || undefined
 			)
 			this._messageicc = new IccMessageXApi(
