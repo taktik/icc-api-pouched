@@ -519,6 +519,7 @@ export namespace iccapipouched {
 				)).rows.reduce((map: { [key: string]: string[] }, user: UserDto) => {
 					user.roles &&
 						user.roles.reduce((map: { [key: string]: string[] }, role: string) => {
+							// tslint:disable-next-line:semicolon
 							;(map[role] || (map[role] = [])).push(user.id!)
 							return map
 						}, map)
