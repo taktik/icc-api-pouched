@@ -133,6 +133,8 @@ export namespace iccapipouched {
 
 		private _database: PouchDB.Database | null = null
 
+		private _hcpIdForUserIdCache: Promise<{ [key: string]: string }> | null = null
+
 		constructor(
 			host: string,
 			username: string,
@@ -492,6 +494,20 @@ export namespace iccapipouched {
 					Promise.resolve()
 				)
 			}
+		}
+
+		async getHcpIdForUserId(userId: string) {
+			if (!this._hcpIdForUserIdCache) {
+				this._hcpIdForUserIdCache = (await this.usericc.listUsers(
+					undefined,
+					undefined,
+					'100'
+				)).rows.reduce((map: { [key: string]: string }, user: UserDto) => {
+					user.healthcarePartyId && (map[user.id!!] = user.healthcarePartyId)
+					return map
+				}, {})
+			}
+			return (await this._hcpIdForUserIdCache!!)[userId]
 		}
 
 		async getRowsUsingPagination<X>(
