@@ -497,14 +497,14 @@ export namespace iccapipouched {
 		private _hcpIdForUserIdCache: Promise<{ [key: string]: string }> | null = null
 		async getHcpIdForUserId(userId: string) {
 			if (!this._hcpIdForUserIdCache) {
-				this._hcpIdForUserIdCache = (await this.usericc.listUsers(
-					undefined,
-					undefined,
-					'100'
-				)).rows.reduce((map: { [key: string]: string }, user: UserDto) => {
-					user.healthcarePartyId && (map[user.id!] = user.healthcarePartyId)
-					return map
-				}, {})
+				this._hcpIdForUserIdCache = this.usericc
+					.listUsers(undefined, undefined, '100')
+					.then(rows =>
+						rows.reduce((map: { [key: string]: string }, user: UserDto) => {
+							user.healthcarePartyId && (map[user.id!] = user.healthcarePartyId)
+							return map
+						}, {})
+					)
 			}
 			return (await this._hcpIdForUserIdCache!)[userId]
 		}
@@ -512,19 +512,22 @@ export namespace iccapipouched {
 		private _userIdsWithRoleCache: Promise<{ [key: string]: string[] }> | null = null
 		async getUserIdsWithRole(role: string) {
 			if (!this._userIdsWithRoleCache) {
-				this._userIdsWithRoleCache = (await this.usericc.listUsers(
-					undefined,
-					undefined,
-					'100'
-				)).rows.reduce((map: { [key: string]: string[] }, user: UserDto) => {
-					user.roles &&
-						user.roles.reduce((map: { [key: string]: string[] }, role: string) => {
-							// tslint:disable-next-line:semicolon
-							;(map[role] || (map[role] = [])).push(user.id!)
+				this._userIdsWithRoleCache = this.usericc
+					.listUsers(undefined, undefined, '100')
+					.then(rows =>
+						rows.reduce((map: { [key: string]: string[] }, user: UserDto) => {
+							user.roles &&
+								user.roles.reduce(
+									(map: { [key: string]: string[] }, role: string) => {
+										// tslint:disable-next-line:semicolon
+										;(map[role] || (map[role] = [])).push(user.id!)
+										return map
+									},
+									map
+								)
 							return map
-						}, map)
-					return map
-				}, {})
+						}, {})
+					)
 			}
 			return (await this._userIdsWithRoleCache!!)[role]
 		}
