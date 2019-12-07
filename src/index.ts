@@ -499,7 +499,7 @@ export namespace iccapipouched {
 			if (!this._hcpIdForUserIdCache) {
 				this._hcpIdForUserIdCache = this.usericc
 					.listUsers(undefined, undefined, '100')
-					.then(rows =>
+					.then(({ rows }) =>
 						rows.reduce((map: { [key: string]: string }, user: UserDto) => {
 							user.healthcarePartyId && (map[user.id!] = user.healthcarePartyId)
 							return map
@@ -514,7 +514,7 @@ export namespace iccapipouched {
 			if (!this._userIdsWithRoleCache) {
 				this._userIdsWithRoleCache = this.usericc
 					.listUsers(undefined, undefined, '100')
-					.then(rows =>
+					.then(({ rows }) =>
 						rows.reduce((map: { [key: string]: string[] }, user: UserDto) => {
 							user.roles &&
 								user.roles.reduce(
