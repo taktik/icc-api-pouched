@@ -47,7 +47,7 @@
 		"rimraf": "^2.6.2"
 	},
 	"dependencies": {
-		"icc-api": "1.0.205",
+		"icc-api": "1.0.206",
 		"lodash": "^4.17.12",
 		"moment": "^2.24.0",
 		"pouchdb": "^7.0.0"
