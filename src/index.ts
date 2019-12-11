@@ -424,6 +424,7 @@ export namespace iccapipouched {
 							'maidenName',
 							'spouseName',
 							'gender',
+							'active',
 							'dateOfBirth',
 							'externalId',
 							'addresses'
