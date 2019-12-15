@@ -78,6 +78,7 @@ export namespace iccapipouched {
 		readonly calendaritemicc: IccCalendarItemXApi
 		readonly timetableicc: IccTimeTableXApi
 		readonly usericc: IccUserXApi
+		readonly cryptoicc: IccCryptoXApi
 		readonly hcpartyicc: IccHcpartyXApi
 		readonly contacticc: IccContactXApi
 		readonly accesslogicc: IccAccesslogXApi
@@ -384,7 +385,7 @@ export namespace iccapipouched {
 				})
 		}
 
-		async sync(crypto: IccCryptoXApi, max = 10000): Promise<void> {
+		async sync(crypto: IccCryptoXApi, ts = 0, max = 10000): Promise<void> {
 			const currentUser = await this._usericc.getCurrentUser()
 			if (currentUser) {
 				const paginator: PaginatorFunction<PatientDto> = async (
@@ -395,7 +396,7 @@ export namespace iccapipouched {
 					const pl = await this.patienticc.listOfPatientsModifiedAfterWithUser(
 						currentUser,
 						this.latestSync,
-						key,
+						key || ts,
 						docId || undefined,
 						limit || 100
 					)
