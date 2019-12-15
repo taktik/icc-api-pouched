@@ -494,6 +494,7 @@ export namespace iccapipouched {
 					Promise.resolve()
 				)
 			}
+			console.log('sync done')
 		}
 
 		private _hcpIdForUserIdCache: Promise<{ [key: string]: string }> | null = null
