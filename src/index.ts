@@ -521,17 +521,19 @@ export namespace iccapipouched {
 				this._userIdsWithRoleCache = this.usericc
 					.listUsers(undefined, undefined, '100')
 					.then(({ rows }) =>
-						rows.reduce((map: { [key: string]: string[] }, user: UserDto) => {
-							;(getRoles(user) || []).reduce(
-								(map: { [key: string]: string[] }, role: string) => {
-									// tslint:disable-next-line:semicolon
-									;(map[role] || (map[role] = [])).push(user.id!)
-									return map
-								},
-								map
-							)
-							return map
-						}, {})
+						rows
+							.filter((u: UserDto) => (u.status || '').toString() === 'ACTIVE')
+							.reduce((map: { [key: string]: string[] }, user: UserDto) => {
+								;(getRoles(user) || []).reduce(
+									(map: { [key: string]: string[] }, role: string) => {
+										// tslint:disable-next-line:semicolon
+										;(map[role] || (map[role] = [])).push(user.id!)
+										return map
+									},
+									map
+								)
+								return map
+							}, {})
 					)
 			}
 			return (await this._userIdsWithRoleCache!!)[role]
