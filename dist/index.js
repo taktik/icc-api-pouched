@@ -443,14 +443,16 @@ var iccapipouched
 					this._userIdsWithRoleCache = this.usericc
 						.listUsers(undefined, undefined, '100')
 						.then(({ rows }) =>
-							rows.reduce((map, user) => {
-								;(getRoles(user) || []).reduce((map, role) => {
-									// tslint:disable-next-line:semicolon
-									;(map[role] || (map[role] = [])).push(user.id)
+							rows
+								.filter(u => (u.status || '').toString() === 'ACTIVE')
+								.reduce((map, user) => {
+									;(getRoles(user) || []).reduce((map, role) => {
+										// tslint:disable-next-line:semicolon
+										;(map[role] || (map[role] = [])).push(user.id)
+										return map
+									}, map)
 									return map
-								}, map)
-								return map
-							}, {})
+								}, {})
 						)
 				}
 				return (yield this._userIdsWithRoleCache)[role]
