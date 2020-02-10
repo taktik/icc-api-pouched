@@ -382,13 +382,8 @@ export namespace iccapipouched {
 							Object.assign(
 								{},
 								res,
-								_.sortBy(res.rows.filter(
-									p =>
-										p.doc &&
-										(p.doc as any).java_type ===
-											'org.taktik.icure.entities.Patient' &&
-										(p.doc as any).active !== false
-								), ['lastName', 'firstName'])
+								{ rows: _.sortBy(res.rows.filter(p => p.doc &&
+										p.doc._id && (p.doc as any).active !== false), ['doc.lastName', 'doc.firstName'])}
 							)
 						)
 			).then(result => {
