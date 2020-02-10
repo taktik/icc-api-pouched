@@ -369,7 +369,7 @@ export namespace iccapipouched {
 
 		// TODO fix any to PatientStub
 		async search<T>(term: string, limit?: number): Promise<Array<any>> {
-			return (term && term.length
+			return (term && term.length > 2
 				? this.database.query('Patient/by_search_string', {
 					startkey: term,
 					endkey: term + '\ufff0',
@@ -383,7 +383,7 @@ export namespace iccapipouched {
 								{},
 								res,
 								{ rows: _.sortBy(res.rows.filter(p => p.doc &&
-										p.doc._id && (p.doc as any).active !== false), ['doc.lastName', 'doc.firstName'])}
+										p.doc._id && (p.doc as any).active !== false && (!term || !term.length || ((p.doc as any).firstName && (p.doc as any).firstName.toLowerCase().includes(term.toLowerCase())) || ((p.doc as any).lastName && (p.doc as any).lastName.toLowerCase().includes(term.toLowerCase()))), ['doc.lastName', 'doc.firstName'])}
 							)
 						)
 			).then(result => {
