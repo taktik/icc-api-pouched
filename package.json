@@ -5,12 +5,12 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"build": "npm run tslint && tsc",
+		"build": "tsc",
 		"tslint": "tslint src/*",
 		"test:debug": "karma start",
 		"test": "karma start  --single-run",
 		"prepare": "rimraf dist && npm run build",
-		"precommit": "pretty-quick --staged"
+		"precommit": "tslint -q --fix src/*"
 	},
 	"keywords": [
 		"icc",

@@ -371,10 +371,10 @@ export namespace iccapipouched {
 		async search<T>(term: string, limit?: number): Promise<Array<any>> {
 			return (term && term.length
 				? this.database.query('Patient/by_search_string', {
-						startkey: term,
-						endkey: term + '\ufff0',
-						limit: limit || 100,
-						include_docs: true
+					startkey: term,
+					endkey: term + '\ufff0',
+					limit: limit || 100,
+					include_docs: true
 				  })
 				: this.database
 						.allDocs({ include_docs: true })
@@ -382,13 +382,13 @@ export namespace iccapipouched {
 							Object.assign(
 								{},
 								res,
-								res.rows.filter(
+								_.sortBy(res.rows.filter(
 									p =>
 										p.doc &&
 										(p.doc as any).java_type ===
 											'org.taktik.icure.entities.Patient' &&
 										(p.doc as any).active !== false
-								)
+								), ['lastName', 'firstName'])
 							)
 						)
 			).then(result => {
