@@ -369,20 +369,35 @@ export namespace iccapipouched {
 
 		// TODO fix any to PatientStub
 		async search<T>(term: string, limit?: number): Promise<Array<any>> {
-			return this.database
-				.query('Patient/by_search_string', {
-					startkey: term,
-					endkey: term + '\ufff0',
-					limit: limit || 100,
-					include_docs: true
-				})
-				.then(result => {
-					return result.rows.map(
-						r =>
-							r.doc &&
-							new PatientDto(Object.assign(r.doc, { id: r.doc._id, rev: undefined }))
-					)
-				})
+			return (term && term.length
+				? this.database.query('Patient/by_search_string', {
+						startkey: term,
+						endkey: term + '\ufff0',
+						limit: limit || 100,
+						include_docs: true
+				  })
+				: this.database
+						.allDocs({ include_docs: true })
+						.then(res =>
+							Object.assign(
+								{},
+								res,
+								res.rows.filter(
+									p =>
+										p.doc &&
+										(p.doc as any).java_type ===
+											'org.taktik.icure.entities.Patient' &&
+										(p.doc as any).active !== false
+								)
+							)
+						)
+			).then(result => {
+				return result.rows.map(
+					r =>
+						r.doc &&
+						new PatientDto(Object.assign(r.doc, { id: r.doc._id, rev: undefined }))
+				)
+			})
 		}
 
 		async sync(crypto: IccCryptoXApi, ts = 0, max = 10000): Promise<void> {
