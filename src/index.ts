@@ -172,7 +172,7 @@ export namespace iccapipouched {
 			)
 			this._receipticc = new IccReceiptXApi(this._host, this._headers, this._cryptoicc)
 			this._contacticc = new IccContactXApi(this._host, this._headers, this._cryptoicc)
-			this._documenticc = new IccDocumentXApi(this._host, this._authicc, this._headers, this._cryptoicc)
+			this._documenticc = new IccDocumentXApi(this._host, this._headers, this._cryptoicc, this._authicc)
 			this._formicc = new IccFormXApi(this._host, this._headers, this._cryptoicc)
 			this._helementicc = new IccHelementXApi(this._host, this._headers, this._cryptoicc)
 			this._invoiceicc = new IccInvoiceXApi(
