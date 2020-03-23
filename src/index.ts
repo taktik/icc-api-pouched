@@ -3,7 +3,7 @@ import {
 	iccAuthApi,
 	iccCalendarItemTypeApi,
 	IccClassificationXApi,
-	iccEntityrefApi,
+	iccEntityrefApi, iccGroupApi,
 	iccHcpartyApi,
 	iccInsuranceApi,
 	iccPatientApi,
@@ -131,6 +131,7 @@ export namespace iccapipouched {
 		private readonly _classificationicc: IccClassificationXApi
 		private readonly _patienticc: IccPatientXApi
 		private readonly _messageicc: IccMessageXApi
+		private readonly _groupicc: iccGroupApi
 
 		private _database: PouchDB.Database | null = null
 
@@ -209,6 +210,10 @@ export namespace iccapipouched {
 				this._documenticc,
 				this._receipticc,
 				this._patienticc
+			)
+			this._groupicc = new iccGroupApi(
+				this._host,
+				this._headers
 			)
 		}
 
@@ -356,6 +361,10 @@ export namespace iccapipouched {
 
 		get accesslogicc(): IccAccesslogXApi {
 			return this._accesslogicc
+		}
+
+		get groupicc(): iccGroupApi {
+			return this._groupicc
 		}
 
 		async getPatient(id: string) {
