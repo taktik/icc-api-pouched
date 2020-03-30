@@ -11,27 +11,27 @@ import {
 	IccTimeTableXApi,
 	PatientDto,
 	UserDto
-} from 'icc-api'
+} from '@taktik/icc-api'
 
 import PouchDB from 'pouchdb'
 import * as _ from 'lodash'
 
-import { IccCodeXApi } from 'icc-api/dist/icc-x-api/icc-code-x-api'
-import { IccCalendarItemXApi } from 'icc-api/dist/icc-x-api/icc-calendar-item-x-api'
-import { IccContactXApi } from 'icc-api/dist/icc-x-api/icc-contact-x-api'
-import { IccCryptoXApi } from 'icc-api/dist/icc-x-api/icc-crypto-x-api'
-import { IccDocumentXApi } from 'icc-api/dist/icc-x-api/icc-document-x-api'
-import { IccFormXApi } from 'icc-api/dist/icc-x-api/icc-form-x-api'
-import { IccHcpartyXApi } from 'icc-api/dist/icc-x-api/icc-hcparty-x-api'
-import { IccHelementXApi } from 'icc-api/dist/icc-x-api/icc-helement-x-api'
-import { IccPatientXApi } from 'icc-api/dist/icc-x-api/icc-patient-x-api'
-import { IccReceiptXApi } from 'icc-api/dist/icc-x-api/icc-receipt-x-api'
-import { IccUserXApi } from 'icc-api/dist/icc-x-api/icc-user-x-api'
-import { IccInvoiceXApi } from 'icc-api/dist/icc-x-api/icc-invoice-x-api'
-import { IccMessageXApi } from 'icc-api/dist/icc-x-api/icc-message-x-api'
+import { IccCodeXApi } from '@taktik/icc-api/dist/icc-x-api/icc-code-x-api'
+import { IccCalendarItemXApi } from '@taktik/icc-api/dist/icc-x-api/icc-calendar-item-x-api'
+import { IccContactXApi } from '@taktik/icc-api/dist/icc-x-api/icc-contact-x-api'
+import { IccCryptoXApi } from '@taktik/icc-api/dist/icc-x-api/icc-crypto-x-api'
+import { IccDocumentXApi } from '@taktik/icc-api/dist/icc-x-api/icc-document-x-api'
+import { IccFormXApi } from '@taktik/icc-api/dist/icc-x-api/icc-form-x-api'
+import { IccHcpartyXApi } from '@taktik/icc-api/dist/icc-x-api/icc-hcparty-x-api'
+import { IccHelementXApi } from '@taktik/icc-api/dist/icc-x-api/icc-helement-x-api'
+import { IccPatientXApi } from '@taktik/icc-api/dist/icc-x-api/icc-patient-x-api'
+import { IccReceiptXApi } from '@taktik/icc-api/dist/icc-x-api/icc-receipt-x-api'
+import { IccUserXApi } from '@taktik/icc-api/dist/icc-x-api/icc-user-x-api'
+import { IccInvoiceXApi } from '@taktik/icc-api/dist/icc-x-api/icc-invoice-x-api'
+import { IccMessageXApi } from '@taktik/icc-api/dist/icc-x-api/icc-message-x-api'
 
 import { Moment } from 'moment'
-import { IccAccesslogXApi } from 'icc-api/dist/icc-x-api/icc-accesslog-x-api'
+import { IccAccesslogXApi } from '@taktik/icc-api/dist/icc-x-api/icc-accesslog-x-api'
 import moment = require('moment')
 
 export namespace iccapipouched {
@@ -525,7 +525,7 @@ export namespace iccapipouched {
 		async getHcpIdForUserId(userId: string) {
 			if (!this._hcpIdForUserIdCache) {
 				this._hcpIdForUserIdCache = this.usericc
-					.listUsers(undefined, undefined, '100')
+					.listUsers(undefined, undefined, 100)
 					.then(({ rows }) =>
 						rows.reduce((map: { [key: string]: string }, user: UserDto) => {
 							user.healthcarePartyId && (map[user.id!] = user.healthcarePartyId)
@@ -543,7 +543,7 @@ export namespace iccapipouched {
 		) {
 			if (!this._userIdsWithRoleCache) {
 				this._userIdsWithRoleCache = this.usericc
-					.listUsers(undefined, undefined, '100')
+					.listUsers(undefined, undefined, 100)
 					.then(({ rows }) =>
 						rows
 							.filter((u: UserDto) => (u.status || '').toString() === 'ACTIVE')
