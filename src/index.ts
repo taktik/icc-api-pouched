@@ -493,13 +493,15 @@ export namespace iccapipouched {
 							}
 						}
 
-						if (filtered._id && (filtered as any).lastName) {
+						if (filtered._id && (filtered as PatientDto).lastName) {
 							let localPat: any = null
 							try {
 								localPat = await this.database.get(filtered._id)
 							} catch {
-								console.log(`Adding doc ${filtered._id}`)
-								await this.database.put(Object.assign(filtered))
+								if (!(filtered as PatientDto).deletionDate) {
+									console.log(`Adding doc ${filtered._id}`)
+									await this.database.put(Object.assign(filtered))
+								}
 							}
 							if (localPat) {
 								console.log(`Updating doc ${localPat._id}`)
@@ -508,9 +510,13 @@ export namespace iccapipouched {
 									: 0
 								const remoteRev = remotePat.rev ? +remotePat.rev.split('-')[0] : 0
 								if (localRev < remoteRev) {
-									await this.database.put(
-										Object.assign(filtered, { _rev: localPat._rev })
-									)
+									if ((filtered as PatientDto).deletionDate) {
+										await this.database.remove(localPat)
+									} else {
+										await this.database.put(
+											Object.assign(filtered, { _rev: localPat._rev })
+										)
+									}
 								}
 							}
 						}
