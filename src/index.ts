@@ -452,6 +452,7 @@ export namespace iccapipouched {
 							'active',
 							'dateOfBirth',
 							'externalId',
+							'deletionDate',
 							'addresses'
 						]
 
@@ -504,15 +505,16 @@ export namespace iccapipouched {
 								}
 							}
 							if (localPat) {
-								console.log(`Updating doc ${localPat._id}`)
 								const localRev = localPat.upstreamRev
 									? +localPat.upstreamRev.split('-')[0]
 									: 0
 								const remoteRev = remotePat.rev ? +remotePat.rev.split('-')[0] : 0
 								if (localRev < remoteRev) {
 									if ((filtered as PatientDto).deletionDate) {
+										console.log(`Deleting doc ${localPat._id}`)
 										await this.database.remove(localPat)
 									} else {
+										console.log(`Updating doc ${localPat._id}`)
 										await this.database.put(
 											Object.assign(filtered, { _rev: localPat._rev })
 										)

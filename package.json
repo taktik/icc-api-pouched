@@ -1,6 +1,6 @@
 {
 	"name": "@taktik/icc-api-pouched",
-	"version": "3.0.11",
+	"version": "3.0.12",
 	"description": "iCure Cloud api and PouchDB",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -47,7 +47,7 @@
 		"typescript": "^3.8.3"
 	},
 	"dependencies": {
-		"@taktik/icc-api": "^3.0.10",
+		"@taktik/icc-api": "^3.0.11",
 		"lodash": "^4.17.12",
 		"moment": "^2.24.0",
 		"pouchdb": "^7.2.1"
