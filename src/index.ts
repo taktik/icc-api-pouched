@@ -1,6 +1,7 @@
 import {
 	AddressDto,
 	iccAuthApi,
+	iccPubsubApi,
 	iccCalendarItemTypeApi,
 	IccClassificationXApi,
 	iccEntityrefApi, iccGroupApi,
@@ -111,6 +112,7 @@ export namespace iccapipouched {
 		private readonly _latestSync: number
 
 		private readonly _authicc: iccAuthApi
+		private readonly _pubsubicc: iccPubsubApi
 		private readonly _insuranceicc: iccInsuranceApi
 		private readonly _entityreficc: iccEntityrefApi
 		private readonly _calendaritemicc: IccCalendarItemXApi
@@ -150,6 +152,7 @@ export namespace iccapipouched {
 			)
 			this._latestSync = latestSync || 0
 			this._insuranceicc = new iccInsuranceApi(this._host, this._headers)
+			this._pubsubicc = new iccPubsubApi(this._host, this._headers)
 			this._authicc = new iccAuthApi(this._host, this._headers)
 			this._entityreficc = new iccEntityrefApi(this._host, this._headers)
 			this._calendaritemtypeicc = new iccCalendarItemTypeApi(this._host, this._headers)
