@@ -77,6 +77,7 @@ export namespace iccapipouched {
 		readonly latestSync: number
 		readonly patienticc: IccPatientXApi
 		readonly calendaritemicc: IccCalendarItemXApi
+		readonly pubsubicc: iccPubsubApi
 		readonly timetableicc: IccTimeTableXApi
 		readonly usericc: IccUserXApi
 		readonly cryptoicc: IccCryptoXApi
@@ -336,6 +337,10 @@ export namespace iccapipouched {
 
 		get patienticc(): IccPatientXApi {
 			return this._patienticc
+		}
+
+		get pubsubicc(): iccPubsubApi {
+			return this._pubsubicc
 		}
 
 		get calendaritemicc(): IccCalendarItemXApi {
