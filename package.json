@@ -47,7 +47,7 @@
 		"typescript": "^3.8.3"
 	},
 	"dependencies": {
-		"@taktik/icc-api": "^3.0.18",
+		"@taktik/icc-api": "^3.0.19",
 		"lodash": "^4.17.12",
 		"moment": "^2.24.0",
 		"pouchdb": "^7.2.1"
