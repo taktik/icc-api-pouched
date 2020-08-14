@@ -483,7 +483,7 @@ export namespace iccapipouched {
 									ecKeys
 								] = await crypto.extractDelegationsSFKsAndEncryptionSKs(
 									remotePat,
-									currentUser.healthcarePartyId
+									currentUser.healthcarePartyId!
 								)
 								remotePat =
 									(await this.patienticc.modifyPatientWithUser(
@@ -491,7 +491,7 @@ export namespace iccapipouched {
 										await crypto.addDelegationsAndEncryptionKeys(
 											null,
 											remotePat,
-											currentUser.healthcarePartyId,
+											currentUser.healthcarePartyId!,
 											remotePat.id!,
 											delSfks[0],
 											ecKeys[0]
@@ -543,7 +543,7 @@ export namespace iccapipouched {
 				this._hcpIdForUserIdCache = this.usericc
 					.listUsers(undefined, undefined, 100)
 					.then(({ rows }) =>
-						rows.reduce((map: { [key: string]: string }, user: UserDto) => {
+						(rows || []).reduce((map: { [key: string]: string }, user: UserDto) => {
 							user.healthcarePartyId && (map[user.id!] = user.healthcarePartyId)
 							return map
 						}, {})
@@ -561,7 +561,7 @@ export namespace iccapipouched {
 				this._userIdsWithRoleCache = this.usericc
 					.listUsers(undefined, undefined, 100)
 					.then(({ rows }) =>
-						rows
+						(rows || [])
 							.filter((u: UserDto) => (u.status || '').toString() === 'ACTIVE')
 							.reduce((map: { [key: string]: string[] }, user: UserDto) => {
 								;(getRoles(user) || []).reduce(
