@@ -502,7 +502,7 @@ export namespace iccapipouched {
 							}
 						}
 
-						if (filtered._id && (filtered as PatientDto).lastName) {
+						if (filtered._id && ((filtered as PatientDto).lastName || ((filtered as PatientDto).deletionDate))) {
 							let localPat: any = null
 							try {
 								localPat = await this.database.get(filtered._id)
