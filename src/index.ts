@@ -537,19 +537,23 @@ export namespace iccapipouched {
 			console.log('sync done')
 		}
 
-		private _hcpIdForUserIdCache: Promise<{ [key: string]: string }> | null = null
+		private _hcpIdForUserIdAndReverseCache: Promise<{ [key: string]: string }> | null = null
 		async getHcpIdForUserId(userId: string) {
-			if (!this._hcpIdForUserIdCache) {
-				this._hcpIdForUserIdCache = this.usericc
+			if (!this._hcpIdForUserIdAndReverseCache) {
+				this._hcpIdForUserIdAndReverseCache = this.usericc
 					.listUsers(undefined, undefined, 100)
 					.then(({ rows }) =>
 						(rows || []).reduce((map: { [key: string]: string }, user: UserDto) => {
-							user.healthcarePartyId && (map[user.id!] = user.healthcarePartyId)
+							user.id && user.healthcarePartyId && (map[user.id] = user.healthcarePartyId)
+							user.id && user.healthcarePartyId && (map[user.healthcarePartyId] = user.id)
 							return map
 						}, {})
 					)
 			}
-			return (await this._hcpIdForUserIdCache!)[userId]
+			return (await this._hcpIdForUserIdAndReverseCache!)[userId]
+		}
+		async getUserIdForHcpId(hcpId: string) {
+			return this.getHcpIdForUserId(hcpId)
 		}
 
 		private _userIdsWithRoleCache: Promise<{ [key: string]: string[] }> | null = null
