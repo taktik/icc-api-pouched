@@ -541,7 +541,7 @@ export namespace iccapipouched {
 		async getHcpIdForUserId(userId: string) {
 			if (!this._hcpIdForUserIdAndReverseCache) {
 				this._hcpIdForUserIdAndReverseCache = this.usericc
-					.listUsers(undefined, undefined, 100)
+					.listUsers(undefined, undefined, 1000)
 					.then(({ rows }) =>
 						(rows || []).reduce((map: { [key: string]: string }, user: UserDto) => {
 							user.id && user.healthcarePartyId && (map[user.id] = user.healthcarePartyId)
