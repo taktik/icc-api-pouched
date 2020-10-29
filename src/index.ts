@@ -91,6 +91,8 @@ export namespace iccapipouched {
 
 		search<T>(term: string, limit: number): Promise<Array<any>>
 
+		searchByEmail<T>(term: string, limit: number): Promise<Array<any>>
+
 		moment(timestamp: number | string): Moment | null
 	}
 
@@ -403,6 +405,38 @@ export namespace iccapipouched {
 					include_docs: true
 				  })
 				: this.database
+						.allDocs({ include_docs: true })
+						.then(res =>
+							Object.assign(
+								{},
+								res,
+								{ rows: _.sortBy(res.rows.filter(p => p.doc &&
+										p.doc._id && (showInactive || (p.doc as any).active !== false)
+										&& (!term ||
+											!term.length ||
+											((p.doc as any).firstName && (p.doc as any).firstName.toLowerCase().includes(term.toLowerCase())) ||
+											((p.doc as any).lastName && (p.doc as any).lastName.toLowerCase().includes(term.toLowerCase())))
+									), ['doc.lastName', 'doc.firstName'])}
+							)
+						)
+			).then(result => {
+				return result.rows.map(
+					r =>
+						r.doc &&
+						new PatientDto(Object.assign(r.doc, { id: r.doc._id, rev: undefined }))
+				)
+			})
+		}
+
+		async searchByEmail<T>(term: string, limit?: number, showInactive: boolean = false): Promise<Array<any>> {
+			return (term && term.length > 2
+					? this.database.query('Patient/by_email', {
+						startkey: term,
+						endkey: term + '\ufff0',
+						limit: limit || 100,
+						include_docs: true
+					})
+					: this.database
 						.allDocs({ include_docs: true })
 						.then(res =>
 							Object.assign(
