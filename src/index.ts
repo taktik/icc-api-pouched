@@ -300,7 +300,7 @@ export namespace iccapipouched {
 							'function(doc) {\n' +
 							'!doc.deleted && (doc.addresses || []]).forEach(a => {\n' +
 							'(a.telecoms || []]).forEach(t => {\n' +
-							't.telecomNumber && t.telecomType === "email" && emit(t.telecomNumber,1)})})\n' +
+							't.telecomNumber && t.telecomType === "email" && emit(t.telecomNumber.toLowerCase(),1)})})\n' +
 							'}'
 					}
 
