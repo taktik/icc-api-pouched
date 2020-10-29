@@ -298,8 +298,8 @@ export namespace iccapipouched {
 					by_email: {
 						map:
 							'function(doc) {\n' +
-							'!doc.deleted && (doc.addresses || []]).forEach(a => {\n' +
-							'(a.telecoms || []]).forEach(t => {\n' +
+							'!doc.deleted && (doc.addresses || []).forEach(a => {\n' +
+							'(a.telecoms || []).forEach(t => {\n' +
 							't.telecomNumber && t.telecomType === "email" && emit(t.telecomNumber.toLowerCase(),1)})})\n' +
 							'}'
 					}
