@@ -292,7 +292,16 @@ export namespace iccapipouched {
 							'}\n' +
 							'})' +
 							'}'
+					},
+					by_email: {
+						map:
+							'function(doc) {\n' +
+							'!doc.deleted && (doc.addresses || []]).forEach(a => {\n' +
+							'(a.telecoms || []]).forEach(t => {\n' +
+							't.telecomNumber && t.telecomType === "email" && emit(t.telecomNumber,1)})})\n' +
+							'}'
 					}
+
 				}
 			}
 
